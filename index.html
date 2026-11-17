@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل الخدمات والأماكن</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            background: #1e3a8a;
+            color: white;
+            padding: 20px 10px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        header h1 { margin: 0; font-size: 22px; }
+        header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .cat-btn {
+            background: white;
+            border: 1px solid #1e3a8a;
+            color: #1e3a8a;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+        .cat-btn.active {
+            background: #1e3a8a;
+            color: white;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .card h3 { margin: 0 0 5px; color: #1e3a8a; font-size: 18px; }
+        .card p { margin: 4px 0; font-size: 14px; color: #555; }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .btn-action {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+        .call { background: #16a34a; }
+        .map { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📍 دليل الخدمات والأماكن</h1>
+        <p>كل اللي تحتاجه في منطقتك في مكان واحد</p>
+    </header>
+
+    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن مطعم، صيدلية، مواصلات..." onkeyup="filterPlaces()">
+
+    <div class="categories">
+        <button class="cat-btn active" onclick="filterCategory('all', this)">الكل</button>
+        <button class="cat-btn" onclick="filterCategory('food', this)">🍔 مطاعم وكافيهات</button>
+        <button class="cat-btn" onclick="filterCategory('health', this)">💊 صيدليات</button>
+        <button class="cat-btn" onclick="filterCategory('transport', this)">🚌 مواصلات</button>
+    </div>
+
+    <div id="placesList"></div>
+
+    <script>
+        const places = [
+            { name: "مطعم البركة للمأكولات", category: "food", address: "شارع 77 - بجوار المعهد", hours: "12 ظهراً - 2 صباحاً", phone: "01000000001", map: "https://maps.google.com" },
+            { name: "صيدلية الشفاء", category: "health", address: "الشارع الرئيسي - أمام الموقف", hours: "24 ساعة", phone: "01000000002", map: "https://maps.google.com" },
+            { name: "موقف سيارات الأجرة والميكروباص", category: "transport", address: "مدخل المدينة", hours: "6 صباحاً - 12 منتصف الليل", phone: "", map: "https://maps.google.com" },
+            { name: "كافيه النيل", category: "food", address: "شارع 51 - منطقة السوق", hours: "10 صباحاً - 3 صباحاً", phone: "01000000003", map: "https://maps.google.com" }
+        ];
+
+        let currentCategory = 'all';
+
+        function displayPlaces(list) {
+            const container = document.getElementById('placesList');
+            container.innerHTML = '';
+            list.forEach(place => {
+                const callBtn = place.phone ? `<a href="tel:${place.phone}" class="btn-action call">📞 اتصال</a>` : '';
+                container.innerHTML += `
+                    <div class="card">
+                        <h3>${place.name}</h3>
+                        <p>📍 ${place.address}</p>
+                        <p>⏰ ${place.hours}</p>
+                        <div class="actions">
+                            ${callBtn}
+                            <a href="${place.map}" target="_blank" class="btn-action map">🗺️ الموقع على الخريطة</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(cat, btn) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPlaces();
+        }
+
+        function filterPlaces() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = places.filter(p => {
+                const matchCat = currentCategory === 'all' || p.category === currentCategory;
+                const matchText = p.name.toLowerCase().includes(searchText) || p.address.toLowerCase().includes(searchText);
+                return matchCat && matchText;
+            });
+            displayPlaces(filtered);
+        }
+
+        displayPlaces(places);
+    </script>
+
+</body>
+</html>
